@@ -32,7 +32,7 @@ namespace Text
 
 
             //var a = 5 / 2;
-            //_ = Modbus();
+            _ = Modbus();
 
             //_ = S7Comm();
 
@@ -145,7 +145,7 @@ namespace Text
                 object a = await protocol.ReadAsync<bool>("X48");
 
 
-                await protocol.WriteAsync("D8",12.5f);
+                await protocol.WriteAsync("D8", 12.5f);
                 a = await protocol.ReadAsync<float>("D8");
 
 
@@ -266,10 +266,15 @@ namespace Text
 
                 //var c = bytes.ToUnmanagedType<ushort>();
 
-                var modbus = Protocol.CreateModbusAscll();
-                modbus.Connect();
-                //var modbus = Protocol.CreateModbusTcp(new ModbusTcpConnectParameter() { Host = "127.0.0.1" });
-                //await modbus.ConnectAsync();
+                //var modbus = Protocol.CreateModbusAscll();
+                //modbus.Connect();
+                var modbus = Protocol.CreateModbusTcp(new ModbusTcpConnectParameter() { Host = "127.0.0.1" });
+                await modbus.ConnectAsync();
+
+                var a = await modbus.ReadAsync<ushort>(1, "40001");
+
+                Console.ReadLine();
+
                 //modbus.Connect();
                 //modbus.Close();
                 //var modbusReadParameter = new ModbusReadParameter
