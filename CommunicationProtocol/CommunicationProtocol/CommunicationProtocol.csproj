@@ -4,7 +4,23 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <RepositoryUrl>https://github.com/github-zk-png/IndustrialCommunicationProtocol</RepositoryUrl>
+    <Version>1.0.2</Version>
+    <RepositoryType />
+    <RepositoryUrl>https://github.com/github-zk-png/IndustrialCommunicationProtocol.git</RepositoryUrl>
+    <Authors>CommunicationProtocol</Authors>
+    <Company>CommunicationProtocol</Company>
+    <Copyright />
+    <Description>CommunicationProtocol</Description>
+    <Name />
+    <PackageIcon />
+    <PackageIconUrl />
+    <PackageId>CommunicationProtocol</PackageId>
+    <PackageLicenseUrl />
+    <PackageProjectUrl />
+    <PackageReleaseNotes>test</PackageReleaseNotes>
+    <PackageTags />
+    <Product>CommunicationProtocol</Product>
+    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
