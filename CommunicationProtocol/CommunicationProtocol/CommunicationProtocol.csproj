@@ -20,7 +20,7 @@
     <PackageReleaseNotes>test</PackageReleaseNotes>
     <PackageTags />
     <Product>CommunicationProtocol</Product>
-    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
