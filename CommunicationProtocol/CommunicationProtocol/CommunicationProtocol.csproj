@@ -4,24 +4,31 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.0.2</Version>
+    <Version>1.0.4</Version>
     <RepositoryType />
-    <RepositoryUrl>https://github.com/github-zk-png/IndustrialCommunicationProtocol.git</RepositoryUrl>
+    <RepositoryUrl></RepositoryUrl>
     <Authors>CommunicationProtocol</Authors>
     <Company>CommunicationProtocol</Company>
-    <Copyright />
     <Description>CommunicationProtocol</Description>
     <Name />
     <PackageIcon />
     <PackageIconUrl />
     <PackageId>CommunicationProtocol</PackageId>
     <PackageLicenseUrl />
-    <PackageProjectUrl />
-    <PackageReleaseNotes>test</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/github-zk-png/IndustrialCommunicationProtocol</PackageProjectUrl>
+    <PackageReleaseNotes>Add License</PackageReleaseNotes>
     <PackageTags />
     <Product>CommunicationProtocol</Product>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="OPCFoundation.NetStandard.Opc.Ua" Version="1.5.377.22" />

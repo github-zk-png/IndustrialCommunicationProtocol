@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunicationProtocol" Version="1.0.1" />
+    <ProjectReference Include="..\CommunicationProtocol\CommunicationProtocol.csproj" />
   </ItemGroup>
 
 </Project>
