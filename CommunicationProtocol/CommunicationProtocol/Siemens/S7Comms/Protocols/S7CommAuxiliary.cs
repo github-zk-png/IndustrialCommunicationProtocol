@@ -59,7 +59,7 @@ namespace CommunicationProtocol.Siemens.S7Comms.Protocols
             {
                 var length = parameter.DataItemType == S7CommDataItemTypeEnum.BYTE ? (ushort)(parameter.Values.Length << 3) : (ushort)parameter.Values.Length;
                 // ==================== S7 - DATA - Item====================
-                requestFrame[offset] = 0x00; /
+                requestFrame[offset] = 0x00; 
                 requestFrame[offset + 1] = (byte)parameter.DataItemType;
                 BinaryPrimitives.WriteUInt16BigEndian(requestFrame[(offset + 2)..(offset + 4)], length); 
                 parameter.Values.Span.CopyTo(requestFrame[(offset + 4)..(offset + 4 + parameter.Values.Length)]); 
@@ -237,7 +237,7 @@ namespace CommunicationProtocol.Siemens.S7Comms.Protocols
 
 
             // ==================== S7 Parameter ====================
-            requestFrame[17] = 0x04;        /
+            requestFrame[17] = 0x04;        
             requestFrame[18] = (byte)parameters.Count;      
 
             FinalizeS7ParameterItems(parameters, requestFrame);
