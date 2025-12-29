@@ -8,16 +8,16 @@ namespace CommunicationProtocol.Modbus.Protocols
 {
     public interface IModbusAscll: ISerialPortProtocol
     {
-        public string ReadString(byte slave, string regionalAddress, byte length);
+        string ReadString(byte slave, string regionalAddress, byte length);
 
-        public bool WriteString(byte slave, string regionalAddress, string value);
+        bool WriteString(byte slave, string regionalAddress, string value);
 
-        public T Read<T>(byte slave, string regionalAddress) where T : unmanaged;
+        T Read<T>(byte slave, string regionalAddress) where T : unmanaged;
 
-        public bool Write<T>(byte slave, string regionalAddress, T value) where T : unmanaged;
+        bool Write<T>(byte slave, string regionalAddress, T value) where T : unmanaged;
 
-        public ReadOnlyMemory<byte> Read(ModbusReadParameter parameter);
+        ReadOnlyMemory<byte> Read(ModbusReadParameter parameter);
 
-        public bool Write(ModbusWriteParameter parameter);
+        bool Write(ModbusWriteParameter parameter);
     }
 }

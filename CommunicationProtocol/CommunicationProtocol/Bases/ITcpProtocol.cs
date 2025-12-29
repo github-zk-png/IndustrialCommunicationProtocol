@@ -8,8 +8,8 @@ namespace CommunicationProtocol.Bases
 {
     public interface ITcpProtocol:IAsyncDisposable
     {
-        public TcpClient TcpClient { get; }
+        TcpClient TcpClient { get; }
 
-        public Task<bool> ConnectAsync();
+        Task<bool> ConnectAsync();
     }
 }
