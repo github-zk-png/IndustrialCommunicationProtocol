@@ -7,8 +7,8 @@ namespace CommunicationProtocol.Bases
 {
     public interface ISerialPortProtocol : IDisposable
     {
-        public SerialPort SerialPort { get; }
+        SerialPort SerialPort { get; }
 
-        public bool Connect();
+        bool Connect();
     }
 }
