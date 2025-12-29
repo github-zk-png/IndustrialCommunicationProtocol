@@ -2,12 +2,16 @@
 using CommunicationProtocol.Mitsubishis.Mc3es.Models;
 using CommunicationProtocol.Models;
 using CommunicationProtocol.OPC.OpcUas.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json.Linq;
 using Opc.Ua;
 using Opc.Ua.Client;
 using Opc.Ua.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
@@ -20,10 +24,10 @@ namespace CommunicationProtocol.OPC.OpcUas.Protocols
 {
     internal class OpcUa : OpcUaAuxiliary, IOpcUa
     {
-
         public async Task<bool> AnonymousConnectAsync(string url)
         {
-            var SessionFactory = DefaultSessionFactory.Instance;
+
+            var sessionFactory =new DefaultSessionFactory(null!);
 
             var applicationConfiguration = new ApplicationConfiguration
             {
@@ -36,7 +40,7 @@ namespace CommunicationProtocol.OPC.OpcUas.Protocols
 
             var preferredLocales = new List<string>();
 
-            _session = await SessionFactory.CreateAsync(applicationConfiguration, configuredEndpoint, true, "opc", 5000, userIdentity, preferredLocales);
+            _session = await sessionFactory.CreateAsync(applicationConfiguration, configuredEndpoint, true, "opc", 5000, userIdentity, preferredLocales);
 
             return true;
         }
@@ -68,11 +72,11 @@ namespace CommunicationProtocol.OPC.OpcUas.Protocols
 
             var configuredEndpoint = new ConfiguredEndpoint(null, new EndpointDescription(parameter.Url));
 
-            var userIdentity = new UserIdentity(parameter.UserName, parameter.Password);
+            var userIdentity = new UserIdentity(parameter.UserName, Encoding.UTF8.GetBytes(parameter.Password).AsSpan());
 
             var preferredLocales = new List<string>();
 
-            var SessionFactory = DefaultSessionFactory.Instance;
+            var SessionFactory = new DefaultSessionFactory(null!);
 
             _session = await SessionFactory.CreateAsync(applicationConfiguration, configuredEndpoint, true, "opc", 5000, userIdentity, preferredLocales);
 
@@ -87,7 +91,7 @@ namespace CommunicationProtocol.OPC.OpcUas.Protocols
                 ClientConfiguration = new ClientConfiguration()
             };
 
-            var validator = new CertificateValidator();
+            var validator = new CertificateValidator(null!);
 
             validator.CertificateValidation += (se, ev) =>
             {
@@ -126,10 +130,10 @@ namespace CommunicationProtocol.OPC.OpcUas.Protocols
 
             applicationConfiguration.ValidateAsync(ApplicationType.Client).Wait();
 
-            var instance = new ApplicationInstance()
-            {
-                ApplicationConfiguration = applicationConfiguration,
-            };
+
+
+            var instance = new ApplicationInstance(applicationConfiguration,null!);
+
             await instance.CheckApplicationInstanceCertificatesAsync(false, 1024).ConfigureAwait(false);
 
             var endpointDescription = new EndpointDescription(parameter.Url)
@@ -142,11 +146,11 @@ namespace CommunicationProtocol.OPC.OpcUas.Protocols
 
             var preferredLocales = new List<string>();
 
-            var SessionFactory = DefaultSessionFactory.Instance;
+            var sessionFactory = new DefaultSessionFactory(null!);
 
-            var userIdentity = new UserIdentity(parameter.UserName, parameter.Password);
+            var userIdentity = new UserIdentity(parameter.UserName, Encoding.UTF8.GetBytes(parameter.Password).AsSpan());
 
-            _session = await SessionFactory.CreateAsync(applicationConfiguration, configuredEndpoint, true, "opc", 5000, userIdentity, preferredLocales);
+            _session = await sessionFactory.CreateAsync(applicationConfiguration, configuredEndpoint, true, "opc", 5000, userIdentity, preferredLocales);
 
             return true;
         }
@@ -220,10 +224,10 @@ namespace CommunicationProtocol.OPC.OpcUas.Protocols
         public async Task<bool> SetMonitorNode(IReadOnlyList<string> parameters)
         {
             var subscription = _session.DefaultSubscription;
-
+            var telemetry = _session.MessageContext?.Telemetry;
             foreach (var item in parameters)
             {
-                var monitoredItem = new MonitoredItem()
+                var monitoredItem = new MonitoredItem(telemetry!)
                 {
                     StartNodeId = item,
                 };
