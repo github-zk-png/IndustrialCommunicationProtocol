@@ -32,7 +32,7 @@ namespace Text
 
 
             //var a = 5 / 2;
-            _ = Modbus();
+            //_ = Modbus();
 
             //_ = S7Comm();
 
@@ -40,7 +40,7 @@ namespace Text
 
             //_ = Mc3EAsync();
 
-            //_ = OPCUA();
+            _ = OPCUA();
 
             Console.ReadLine();
         }
@@ -88,21 +88,21 @@ namespace Text
                 //    Console.WriteLine($"类型: {result.Value?.GetType().Name}");
                 //    Console.WriteLine("---");
                 //}
-                //var a = new List<string>
-                //{
-                //    "ns=2;s=数据类型示例.16 位设备.K 寄存器.Short1",
-                //    "ns=2;s=数据类型示例.16 位设备.K 寄存器.Short2",
-                //};
+                var a = new List<string>
+                {
+                    "ns=2;s=数据类型示例.16 位设备.K 寄存器.Short1",
+                    "ns=2;s=数据类型示例.16 位设备.K 寄存器.Short2",
+                };
 
-                //protocol.Notification += (name, value) =>
-                //{
-                //    Console.WriteLine($"节点名称: {name}");
-                //    Console.WriteLine($"值: {value.ToString()}");
-                //    Console.WriteLine($"类型: {value?.GetType().Name}");
-                //    Console.WriteLine("---");
-                //};
+                protocol.Notification += (name, value) =>
+                {
+                    Console.WriteLine($"节点名称: {name}");
+                    Console.WriteLine($"值: {value.ToString()}");
+                    Console.WriteLine($"类型: {value?.GetType().Name}");
+                    Console.WriteLine("---");
+                };
 
-                //await protocol.SetMonitorNode(a);
+                await protocol.SetMonitorNode(a);
 
                 //var a = new List<OpcUaWriteParameter>
                 //{
