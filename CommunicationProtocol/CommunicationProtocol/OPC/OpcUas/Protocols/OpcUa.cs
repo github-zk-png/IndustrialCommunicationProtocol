@@ -237,38 +237,31 @@ namespace CommunicationProtocol.OPC.OpcUas.Protocols
 
 		public async Task<bool> SetMonitorNode(IReadOnlyList<OpcUaMonitorNodeParameter> parameters)
 		{
-			try
+
+			var subscription = Session.DefaultSubscription;
+			var telemetry = Session.MessageContext?.Telemetry;
+
+			foreach (var item in parameters)
 			{
-				var subscription = Session.DefaultSubscription;
-				var telemetry = Session.MessageContext?.Telemetry;
-
-				foreach (var item in parameters)
+				var monitoredItem = new MonitoredItem(telemetry!)
 				{
-					var monitoredItem = new MonitoredItem(telemetry!)
-					{
-						StartNodeId = item.Name,
-					};
-					monitoredItem.Notification += item.Notification;
-					subscription.AddItem(monitoredItem);
-				}
-
-				if (!subscription.Created)
-				{
-					Session.AddSubscription(subscription);
-					await subscription.CreateAsync();
-				}
-				else
-				{
-					await subscription.ApplyChangesAsync();
-				}
-
-				return true;
+					StartNodeId = item.Name,
+				};
+				monitoredItem.Notification += item.Notification;
+				subscription.AddItem(monitoredItem);
 			}
-			catch (Exception ex)
+
+			if (!subscription.Created)
 			{
-
-				throw;
+				Session.AddSubscription(subscription);
+				await subscription.CreateAsync();
 			}
+			else
+			{
+				await subscription.ApplyChangesAsync();
+			}
+
+			return true;
 		}
 
 		public async Task<bool> WriteAsync(IReadOnlyList<OpcUaWriteParameter> parameters)
