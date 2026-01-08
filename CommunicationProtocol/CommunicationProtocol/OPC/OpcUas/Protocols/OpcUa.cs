@@ -22,246 +22,276 @@ using System.Threading.Tasks;
 
 namespace CommunicationProtocol.OPC.OpcUas.Protocols
 {
-    internal class OpcUa : OpcUaAuxiliary, IOpcUa
-    {
-        public async Task<bool> AnonymousConnectAsync(string url)
-        {
+	internal class OpcUa : OpcUaAuxiliary, IOpcUa
+	{
+		public async Task<bool> AnonymousConnectAsync(string url)
+		{
 
-            var sessionFactory =new DefaultSessionFactory(null!);
+			var sessionFactory = new DefaultSessionFactory(null!);
 
-            var applicationConfiguration = new ApplicationConfiguration
-            {
-                ClientConfiguration = new ClientConfiguration()
-            };
+			var applicationConfiguration = new ApplicationConfiguration
+			{
+				ClientConfiguration = new ClientConfiguration()
+			};
 
-            var configuredEndpoint = new ConfiguredEndpoint(null, new EndpointDescription(url));
+			var configuredEndpoint = new ConfiguredEndpoint(null, new EndpointDescription(url));
 
-            var userIdentity = new UserIdentity();
+			var userIdentity = new UserIdentity();
 
-            var preferredLocales = new List<string>();
+			var preferredLocales = new List<string>();
 
-            _session = await sessionFactory.CreateAsync(applicationConfiguration, configuredEndpoint, true, "opc", 5000, userIdentity, preferredLocales);
+			Session = await sessionFactory.CreateAsync(applicationConfiguration, configuredEndpoint, true, "opc", 5000, userIdentity, preferredLocales);
 
-            return true;
-        }
+			return true;
+		}
 
-        public async Task<bool> UserConnect(OpcUaConnectParameter parameter)
-        {
-            var applicationConfiguration = new ApplicationConfiguration
-            {
-                ClientConfiguration = new ClientConfiguration()
-            };
+		public async Task<bool> UserConnect(OpcUaConnectParameter parameter)
+		{
+			var applicationConfiguration = new ApplicationConfiguration
+			{
+				ClientConfiguration = new ClientConfiguration()
+			};
 
-            var validator = applicationConfiguration.CertificateValidator;
+			var validator = applicationConfiguration.CertificateValidator;
 
-            validator.CertificateValidation += (se, ev) =>
-            {
-                if (ev.Error.StatusCode.Code == StatusCodes.BadCertificateUntrusted)
-                    ev.Accept = true;
-            };
+			validator.CertificateValidation += (se, ev) =>
+			{
+				if (ev.Error.StatusCode.Code == StatusCodes.BadCertificateUntrusted)
+					ev.Accept = true;
+			};
 
-            applicationConfiguration.SecurityConfiguration = new SecurityConfiguration
-            {
-                RejectSHA1SignedCertificates = false,
-                AutoAcceptUntrustedCertificates = true
-            };
+			applicationConfiguration.SecurityConfiguration = new SecurityConfiguration
+			{
+				RejectSHA1SignedCertificates = false,
+				AutoAcceptUntrustedCertificates = true
+			};
 
-            await validator.UpdateAsync(applicationConfiguration);
+			await validator.UpdateAsync(applicationConfiguration);
 
-            applicationConfiguration.CertificateValidator = validator;
+			applicationConfiguration.CertificateValidator = validator;
 
-            var configuredEndpoint = new ConfiguredEndpoint(null, new EndpointDescription(parameter.Url));
+			var configuredEndpoint = new ConfiguredEndpoint(null, new EndpointDescription(parameter.Url));
 
-            var userIdentity = new UserIdentity(parameter.UserName, Encoding.UTF8.GetBytes(parameter.Password).AsSpan());
+			var userIdentity = new UserIdentity(parameter.UserName, Encoding.UTF8.GetBytes(parameter.Password).AsSpan());
 
-            var preferredLocales = new List<string>();
+			var preferredLocales = new List<string>();
 
-            var SessionFactory = new DefaultSessionFactory(null!);
+			var SessionFactory = new DefaultSessionFactory(null!);
 
-            _session = await SessionFactory.CreateAsync(applicationConfiguration, configuredEndpoint, true, "opc", 5000, userIdentity, preferredLocales);
+			Session = await SessionFactory.CreateAsync(applicationConfiguration, configuredEndpoint, true, "opc", 5000, userIdentity, preferredLocales);
 
-            return true;
-        }
+			return true;
+		}
 
-        public async Task<bool> CertificateConnect(OpcUaConnectParameter parameter)
-        {
-            var applicationConfiguration = new ApplicationConfiguration
-            {
-                ApplicationName = "MyOpc",
-                ClientConfiguration = new ClientConfiguration()
-            };
+		public async Task<bool> CertificateConnect(OpcUaConnectParameter parameter)
+		{
+			var applicationConfiguration = new ApplicationConfiguration
+			{
+				ApplicationName = "MyOpc",
+				ClientConfiguration = new ClientConfiguration()
+			};
 
-            var validator = new CertificateValidator(null!);
+			var validator = new CertificateValidator(null!);
 
-            validator.CertificateValidation += (se, ev) =>
-            {
-                if (ev.Error.StatusCode.Code == StatusCodes.BadCertificateUntrusted)
-                    ev.Accept = true;
-            };
-            applicationConfiguration.CertificateValidator = validator;
+			validator.CertificateValidation += (se, ev) =>
+			{
+				if (ev.Error.StatusCode.Code == StatusCodes.BadCertificateUntrusted)
+					ev.Accept = true;
+			};
+			applicationConfiguration.CertificateValidator = validator;
 
-            applicationConfiguration.SecurityConfiguration = new SecurityConfiguration()
-            {
-                RejectSHA1SignedCertificates = false,
+			applicationConfiguration.SecurityConfiguration = new SecurityConfiguration()
+			{
+				RejectSHA1SignedCertificates = false,
 
-                ApplicationCertificate = new CertificateIdentifier
-                {
-                    StoreType = "Directory",
-                    // CommonApplicationData : C:\\ProgramData
-                    StorePath = @"%CommonApplicationData%/OPC/CertificateStores/MachineDefault",
-                    SubjectName = $"CN=MyOpc,DC={Utils.GetHostName()}"
-                },
-                TrustedPeerCertificates = new CertificateTrustList()
-                {
-                    StoreType = "Directory",
-                    StorePath = @"%CommonApplicationData%/OPC/CertificateStores/UAApplications"
-                },
-                TrustedIssuerCertificates = new CertificateTrustList()
-                {
-                    StoreType = "Directory",
-                    StorePath = @"%CommonApplicationData%/OPC/CertificateStores/UACertificate Authorities"
-                },
-                RejectedCertificateStore = new CertificateTrustList()
-                {
-                    StoreType = "Directory",
-                    StorePath = @"%CommonApplicationData%/OPC/CertificateStores/RejectedCertificates"
-                }
-            };
+				ApplicationCertificate = new CertificateIdentifier
+				{
+					StoreType = "Directory",
+					// CommonApplicationData : C:\\ProgramData
+					StorePath = @"%CommonApplicationData%/OPC/CertificateStores/MachineDefault",
+					SubjectName = $"CN=MyOpc,DC={Utils.GetHostName()}"
+				},
+				TrustedPeerCertificates = new CertificateTrustList()
+				{
+					StoreType = "Directory",
+					StorePath = @"%CommonApplicationData%/OPC/CertificateStores/UAApplications"
+				},
+				TrustedIssuerCertificates = new CertificateTrustList()
+				{
+					StoreType = "Directory",
+					StorePath = @"%CommonApplicationData%/OPC/CertificateStores/UACertificate Authorities"
+				},
+				RejectedCertificateStore = new CertificateTrustList()
+				{
+					StoreType = "Directory",
+					StorePath = @"%CommonApplicationData%/OPC/CertificateStores/RejectedCertificates"
+				}
+			};
 
-            applicationConfiguration.ValidateAsync(ApplicationType.Client).Wait();
+			applicationConfiguration.ValidateAsync(ApplicationType.Client).Wait();
 
 
 
-            var instance = new ApplicationInstance(applicationConfiguration,null!);
+			var instance = new ApplicationInstance(applicationConfiguration, null!);
 
-            await instance.CheckApplicationInstanceCertificatesAsync(false, 1024).ConfigureAwait(false);
+			await instance.CheckApplicationInstanceCertificatesAsync(false, 1024).ConfigureAwait(false);
 
-            var endpointDescription = new EndpointDescription(parameter.Url)
-            {
-                SecurityMode = MessageSecurityMode.SignAndEncrypt,
-                SecurityPolicyUri = SecurityPolicies.Basic256,
-            };
+			var endpointDescription = new EndpointDescription(parameter.Url)
+			{
+				SecurityMode = MessageSecurityMode.SignAndEncrypt,
+				SecurityPolicyUri = SecurityPolicies.Basic256,
+			};
 
-            var configuredEndpoint = new ConfiguredEndpoint(null, endpointDescription);
+			var configuredEndpoint = new ConfiguredEndpoint(null, endpointDescription);
 
-            var preferredLocales = new List<string>();
+			var preferredLocales = new List<string>();
 
-            var sessionFactory = new DefaultSessionFactory(null!);
+			var sessionFactory = new DefaultSessionFactory(null!);
 
-            var userIdentity = new UserIdentity(parameter.UserName, Encoding.UTF8.GetBytes(parameter.Password).AsSpan());
+			var userIdentity = new UserIdentity(parameter.UserName, Encoding.UTF8.GetBytes(parameter.Password).AsSpan());
 
-            _session = await sessionFactory.CreateAsync(applicationConfiguration, configuredEndpoint, true, "opc", 5000, userIdentity, preferredLocales);
+			Session = await sessionFactory.CreateAsync(applicationConfiguration, configuredEndpoint, true, "opc", 5000, userIdentity, preferredLocales);
 
-            return true;
-        }
+			return true;
+		}
 
-        public async ValueTask DisposeAsync()
-        {
-            if (_session != null && _session.Connected)
-            {
-                await _session.CloseAsync();
-            }
-        }
+		public async ValueTask DisposeAsync()
+		{
+			if (Session != null && Session.Connected)
+			{
+				await Session.CloseAsync();
+			}
+		}
 
-        public async Task<T> ReadAsync<T>(string name)
-        {
-            var parameters = new List<OpcUaReadParameter>
-            {
-                new OpcUaReadParameter
-                {
-                    Name = name,
-                }
-            };
+		public async Task<T> ReadAsync<T>(string name)
+		{
+			var parameters = new List<OpcUaReadParameter>
+			{
+				new OpcUaReadParameter
+				{
+					Name = name,
+				}
+			};
 
-            await foreach (var item in ReadAsync(parameters))
-            {
-                return (T)item.Value;
-            }
+			await foreach (var item in ReadAsync(parameters))
+			{
+				return (T)item.Value;
+			}
 
-            return default!;
-        }
+			return default!;
+		}
 
-        public async Task<bool> WriteAsync(string name, object value)
-        {
-            var parameters = new List<OpcUaWriteParameter>
-            {
-                new OpcUaWriteParameter
-                {
-                    Name = name,
-                    Value= value
-                }
-            };
-            return await WriteAsync(parameters);
-        }
+		public async Task<bool> WriteAsync(string name, object value)
+		{
+			var parameters = new List<OpcUaWriteParameter>
+			{
+				new OpcUaWriteParameter
+				{
+					Name = name,
+					Value= value
+				}
+			};
+			return await WriteAsync(parameters);
+		}
 
-        public async IAsyncEnumerable<OpcUaReturnData> ReadAsync(IReadOnlyList<OpcUaReadParameter> parameters)
-        {
-            var readValueIds = new ReadValueIdCollection();
+		public async IAsyncEnumerable<OpcUaReturnData> ReadAsync(IReadOnlyList<OpcUaReadParameter> parameters)
+		{
+			var readValueIds = new ReadValueIdCollection();
 
-            foreach (var item in parameters)
-            {
-                readValueIds.Add(new ReadValueId
-                {
-                    NodeId = item.Name,
-                    AttributeId = Attributes.Value
-                });
-            }
+			foreach (var item in parameters)
+			{
+				readValueIds.Add(new ReadValueId
+				{
+					NodeId = item.Name,
+					AttributeId = Attributes.Value
+				});
+			}
 
-            var readResponse = await _session.ReadAsync(new RequestHeader(), 0, TimestampsToReturn.Both, readValueIds, CancellationToken.None);
+			var readResponse = await Session.ReadAsync(new RequestHeader(), 0, TimestampsToReturn.Both, readValueIds, CancellationToken.None);
 
-            var index = default(ushort);
-            foreach (DataValue item in readResponse.Results)
-            {
-                yield return new OpcUaReturnData
-                {
-                    TransactionId = parameters[index].TransactionId,
-                    Name = parameters[index].Name,
-                    Value = item.Value
-                };
-            }
-        }
+			var index = default(ushort);
+			foreach (DataValue item in readResponse.Results)
+			{
+				yield return new OpcUaReturnData
+				{
+					TransactionId = parameters[index].TransactionId,
+					Name = parameters[index].Name,
+					Value = item.Value
+				};
+			}
+		}
 
-        public async Task<bool> SetMonitorNode(IReadOnlyList<string> parameters)
-        {
-            var subscription = _session.DefaultSubscription;
-            var telemetry = _session.MessageContext?.Telemetry;
-            foreach (var item in parameters)
-            {
-                var monitoredItem = new MonitoredItem(telemetry!)
-                {
-                    StartNodeId = item,
-                };
-                monitoredItem.Notification += MonitoredItem_Notification;
-                subscription.AddItem(monitoredItem);
-            }
-            _session.AddSubscription(subscription);
+		public async Task<bool> SetMonitorNode(string name, MonitoredItemNotificationEventHandler notification)
+		{
+			var parameters = new List<OpcUaMonitorNodeParameter>
+			{
+			  new OpcUaMonitorNodeParameter
+			  {
+				  Name=name,
+				  Notification=notification
+			  }
+			};
 
-            await subscription.CreateAsync();
+			return await SetMonitorNode(parameters);
+		}
 
-            return true;
-        }
+		public async Task<bool> SetMonitorNode(IReadOnlyList<OpcUaMonitorNodeParameter> parameters)
+		{
+			try
+			{
+				var subscription = Session.DefaultSubscription;
+				var telemetry = Session.MessageContext?.Telemetry;
 
-        public async Task<bool> WriteAsync(IReadOnlyList<OpcUaWriteParameter> parameters)
-        {
-            var writeValues = new WriteValueCollection();
+				foreach (var item in parameters)
+				{
+					var monitoredItem = new MonitoredItem(telemetry!)
+					{
+						StartNodeId = item.Name,
+					};
+					monitoredItem.Notification += item.Notification;
+					subscription.AddItem(monitoredItem);
+				}
 
-            foreach (var item in parameters)
-            {
-                var writeValue = new WriteValue
-                {
-                    NodeId = item.Name,
-                    AttributeId = Attributes.Value,
-                    Value = new DataValue()
-                    {
-                        Value = item.Value,
-                    }
-                };
-                writeValues.Add(writeValue);
-            }
+				if (!subscription.Created)
+				{
+					Session.AddSubscription(subscription);
+					await subscription.CreateAsync();
+				}
+				else
+				{
+					await subscription.ApplyChangesAsync();
+				}
 
-            var response = await _session.WriteAsync(new RequestHeader(), writeValues, CancellationToken.None);
+				return true;
+			}
+			catch (Exception ex)
+			{
 
-            return true;
-        }
-    }
+				throw;
+			}
+		}
+
+		public async Task<bool> WriteAsync(IReadOnlyList<OpcUaWriteParameter> parameters)
+		{
+			var writeValues = new WriteValueCollection();
+
+			foreach (var item in parameters)
+			{
+				var writeValue = new WriteValue
+				{
+					NodeId = item.Name,
+					AttributeId = Attributes.Value,
+					Value = new DataValue()
+					{
+						Value = item.Value,
+					}
+				};
+				writeValues.Add(writeValue);
+			}
+
+			await Session.WriteAsync(new RequestHeader(), writeValues, CancellationToken.None);
+
+			return true;
+		}
+	}
 }

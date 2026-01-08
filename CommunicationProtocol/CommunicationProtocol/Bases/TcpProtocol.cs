@@ -14,15 +14,13 @@ namespace CommunicationProtocol.Bases
 
         protected TcpConnectParameter _tcoConnectParameter;
 
-        protected TcpClient _tcpClient;
+        public TcpClient TcpClient { get; protected set; }
 
-        public TcpClient TcpClient => _tcpClient;
-
-        protected ushort _receiveTimeout => (ushort)_tcpClient.ReceiveTimeout;
+        protected ushort _receiveTimeout => (ushort)TcpClient.ReceiveTimeout;
 
         protected TcpProtocol(TcpConnectParameter parameter)
         {
-            _tcpClient = new TcpClient
+            TcpClient = new TcpClient
             {
                 ReceiveTimeout = 5000,
             };
@@ -34,9 +32,9 @@ namespace CommunicationProtocol.Bases
         public virtual async Task<bool> ConnectAsync()
         {
 
-            await _tcpClient.ConnectAsync(_tcoConnectParameter.Host, _tcoConnectParameter.Port);
+            await TcpClient.ConnectAsync(_tcoConnectParameter.Host, _tcoConnectParameter.Port);
 
-            _networkStream = _tcpClient.GetStream();
+            _networkStream = TcpClient.GetStream();
 
             return true;
 
@@ -44,7 +42,7 @@ namespace CommunicationProtocol.Bases
 
         public async ValueTask DisposeAsync()
         {
-            if (_tcpClient != null)
+            if (TcpClient != null)
             {
                 try
                 {
@@ -54,7 +52,7 @@ namespace CommunicationProtocol.Bases
                         await _networkStream.DisposeAsync();
                     }
 
-                    _tcpClient.Client?.Shutdown(SocketShutdown.Both);
+                    TcpClient.Client?.Shutdown(SocketShutdown.Both);
                 }
                 catch (SocketException)
                 {
@@ -62,8 +60,8 @@ namespace CommunicationProtocol.Bases
                 }
                 finally
                 {
-                    _tcpClient?.Close();
-                    _tcpClient?.Dispose();
+                    TcpClient?.Close();
+                    TcpClient?.Dispose();
                 }
             }
         }
