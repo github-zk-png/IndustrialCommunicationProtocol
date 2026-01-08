@@ -10,13 +10,11 @@ namespace CommunicationProtocol.Bases
 {
     internal abstract class SerialPortProtocol
     {
-        protected SerialPort _serialPort;
-
-        public SerialPort SerialPort => _serialPort;
+        public SerialPort SerialPort { get; protected set; }
 
         protected SerialPortProtocol(SerialPortConnectParameter parameter)
         {
-            _serialPort = new SerialPort
+            SerialPort = new SerialPort
             {
                 PortName = parameter.PortName,
                 BaudRate = parameter.BaudRate,
@@ -30,7 +28,7 @@ namespace CommunicationProtocol.Bases
 
         protected virtual ReadOnlyMemory<byte> SendAndReceive(ReadOnlyMemory<byte> requestFrame, int length)
         {
-            _serialPort.Write(requestFrame.ToArray(), 0, requestFrame.Length);
+            SerialPort.Write(requestFrame.ToArray(), 0, requestFrame.Length);
 
             var responseFrame = new byte[length];
             var index = 0;
@@ -39,7 +37,7 @@ namespace CommunicationProtocol.Bases
 
                 try
                 {
-                    var readLength = _serialPort.Read(responseFrame, index, responseFrame.Length - index);
+                    var readLength = SerialPort.Read(responseFrame, index, responseFrame.Length - index);
 
                     index += readLength;
                 }
@@ -54,15 +52,15 @@ namespace CommunicationProtocol.Bases
 
         public bool Connect()
         {
-            _serialPort.Open();
+            SerialPort.Open();
 
-            return _serialPort.IsOpen;
+            return SerialPort.IsOpen;
         }
 
         public void Dispose()
         {
-            _serialPort?.Dispose();
-            _serialPort?.Close();
+            SerialPort?.Dispose();
+            SerialPort?.Close();
 
         }
 
